@@ -23,7 +23,7 @@ export default class Main {
   restart() {
     databus.reset()
     this.prevStatus = databus.status
-    this.currentStatus = new Play(ctx)
+    this.currentStatus = new Test(ctx)
     this.currentStatus.start()
     this.bindLoop = this.loop.bind(this)
     // 清除上一局的动画

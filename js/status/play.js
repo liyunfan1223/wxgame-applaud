@@ -32,6 +32,28 @@ const GANE_INTRO = "在游戏过程中，您需要根据左右声道判断声音
 // const GANE_INTRO = "hehe"
 let instance
 
+class HitEffect {
+  constructor(text, x, y, start_time, gradual_time, direction, speed) {
+    this.text = text
+    this.x = x
+    this.y = y
+    this.start_time = start_time
+    this.gradual_time = gradual_time
+    this.direction = direction
+    this.speed = speed
+  }
+  render(ctx, now) {
+    ctx.fillStyle = "#1c1c1c"
+    ctx.font      = "20px Arial"
+    ctx.globalAlpha = 1 - (now - this.start_time) / this.gradual_time
+    let dx = this.x + Math.cos(this.direction) * this.speed * (now - this.start_time)
+    let dy = this.y + Math.sin(this.direction) * this.speed * (now - this.start_time)
+    ctx.fillText(
+      this.text, dx, dy
+    )
+    ctx.globalAlpha = 1
+  }
+}
 class WebAudioContextWrapper {
   constructor(url) {
     this.url = url
@@ -49,9 +71,11 @@ class WebAudioContextWrapper {
     this.source.connect(this.ctx.destination)
     this.source.start()
     this.started = true
+    this.stopped = false
   }
   stop() {
-    if (this.started) {
+    if (this.started && !this.stopped) {
+      this.stopped = true;
       this.source.stop()
       this.ctx.suspend()
     }
@@ -99,7 +123,8 @@ export default class Play extends Status {
     // this.instrument = new WebAudioContextWrapper('audio/instrument_gz.mp3')
     this.bg = new Image()
     this.bg.src = 'images/play_bg.jpg'
-    this.bgTime = 72
+    this.bgTime = 75
+    this.applaudTime = 8
     this.next_hit = FIRST_HIT
     
     this.score_hit = 0
@@ -109,6 +134,7 @@ export default class Play extends Status {
     this.score_miss = 0
     this.current_direction = 0 // 0 -> left, 1 -> right
     this.hit_map = new Map()
+    this.hit_effects = []
 
     this.instrument_mic = wx.createInnerAudioContext({ useWebAudioImplement: true })
     this.instrument_mic.src = 'audio/instrument_gz.mp3'
@@ -130,6 +156,9 @@ export default class Play extends Status {
     this.operation_counter = 0
     this.slide_op_detector = 0
 
+    if (this.result_speak != undefined) {
+      this.result_speak.pause()
+    }
     this.intro.pause()
     this.bgm.stop()
     canvas.removeEventListener('touchstart', this.touchStartHandler)
@@ -150,8 +179,10 @@ export default class Play extends Status {
     this.next_hit = FIRST_HIT
     this.hit_map = new Map()
     this.start_ts = (new Date()).getTime()
+    this.hit_effects = []
     this.intro.play()
     
+    this.applauded = false
     this.intro.addEventListener('ended', () => {
       this.currentPhase = PHASE_INTRO_END
     })
@@ -194,25 +225,26 @@ export default class Play extends Status {
   render() {
     this.ctx.clearRect(0, 0, canvas.width, canvas.height)
     this.renderMusicInfo()
+    if (this.currentPhase == PHASE_PLAY) {
+      this.render_hit_effects()
+    }
   }
   renderMusicInfo() {
     this.ctx.fillStyle = "#1c1c1c"
     this.ctx.font      = "20px Arial"
     this.ctx.drawImage(this.bg, 0, 0, screenWidth, screenHeight)
-    
-
     if (this.currentPhase == PHASE_INTRO || this.currentPhase == PHASE_INTRO_END) {
       this.ctx.font      = "20px Arial"
       this.FillTextForMultiLinesWithGradual(INTRODUCTION + "\n" + GANE_INTRO, screenWidth / 2 - 150, 80, 300, 2000, 150, 20)
-    } else if (this.currentPhase == PHASE_PLAY || this.currentPhase == PHASE_PLAY_END) {
+    } else if (this.currentPhase == PHASE_PLAY) {
       this.ctx.font      = "20px Arial"
       this.ctx.fillText("正在播放:沧海一声笑", screenWidth / 2 - 100, 80)
-      this.ctx.fillText("播放进度:" + Math.min(100, (this.bgm.getTime() / this.bgTime * 100)).toFixed(0) + '%', screenWidth / 2 - 80, 120)
-      this.ctx.fillText("命中:" + this.score_hit, screenWidth / 2 - 80, 160)
-      this.ctx.fillText("重复:" + this.score_duplicate, screenWidth / 2 - 80, 200)
-      this.ctx.fillText("遗漏:" + this.score_miss, screenWidth / 2 - 80, 240)
-      this.ctx.fillText("太早或太晚:" + this.score_wrongtime, screenWidth / 2 - 80, 280)
-      this.ctx.fillText("方向错误:" + this.score_wrongdir, screenWidth / 2 - 80, 320)
+      this.ctx.fillText("完成进度:" + Math.min(100, (this.bgm.getTime() / this.bgTime * 100)).toFixed(0) + '%', screenWidth / 2 - 80, 120)
+      this.ctx.fillText("综合评价:" + this.Evaluate(), screenWidth / 2 - 80, 160)
+      // this.ctx.fillText("重复:" + this.score_duplicate, screenWidth / 2 - 80, 200)
+      // this.ctx.fillText("遗漏:" + this.score_miss, screenWidth / 2 - 80, 240)
+      // this.ctx.fillText("太早或太晚:" + this.score_wrongtime, screenWidth / 2 - 80, 280)
+      // this.ctx.fillText("方向错误:" + this.score_wrongdir, screenWidth / 2 - 80, 320)
 
       this.ctx.globalAlpha = 0.8
     // let ratio = 2 + (databus.frame % 240 >= 120 ? 240 - databus.frame % 240 : databus.frame % 240) / 100 * 0.2
@@ -222,9 +254,23 @@ export default class Play extends Status {
         screenHeight / 2 - this.instrument_pic.height / 2 / ratio ,
         this.instrument_pic.width / ratio, this.instrument_pic.height / ratio)
         this.ctx.globalAlpha = 1
+    } else if (this.currentPhase == PHASE_PLAY_END) {
+      this.ctx.font      = "20px Arial"
+      this.FillTextForMultiLinesWithGradual(this.result_text, screenWidth / 2 - 150, 80, 300, 2000, 150, 20)
     }
     this.ctx.fillStyle = "#ffffff"
     this.switch_to_test.render(this.ctx)
+  }
+  render_hit_effects() {
+    let now = this.bgm.getTime()
+    for (let i = this.hit_effects.length - 1; i >= 0; i--) {
+      if (this.hit_effects[i].start_time +  this.hit_effects[i].gradual_time < now) {
+        this.hit_effects.splice(i, 1);
+      }
+    }
+    this.hit_effects.forEach((i) => {
+      i.render(this.ctx, now)
+    })
   }
   RecordOperation(operation, type) {
     if (type == 0) {
@@ -243,11 +289,18 @@ export default class Play extends Status {
           if ((operation == "左滑" && this.current_direction == 1) || 
               (operation == "右滑" && this.current_direction == 0)) {
             // 方向不对
+            this.hit_map[this.next_hit] = '方向不对'
+            this.hit_effects.push(
+              new HitEffect("注意方向", this.finger_original[0], this.finger_original[1], 
+                this.bgm.getTime(), 1, Math.PI * 1.5 + (Math.random() - 0.5) * Math.PI * 0.1, 100 + 100 * Math.random()))
             this.score_wrongdir += 1
             wx.vibrateShort()
           } else if (this.hit_map[this.next_hit] === undefined) {
-            this.hit_map[this.next_hit] = 1
+            this.hit_map[this.next_hit] = '命中'
             this.score_hit++;
+            this.hit_effects.push(
+              new HitEffect("命中!", this.finger_original[0], this.finger_original[1], 
+                this.bgm.getTime(), 1, Math.PI * 1.5 + (Math.random() - 0.5) * Math.PI * 0.1, 100 + 100 * Math.random()))
             this.instrument_mic.play()
           } else {
             // 重复操作
@@ -258,7 +311,13 @@ export default class Play extends Status {
           // 时间点不对
           this.score_wrongtime++;
           wx.vibrateShort()
+          this.hit_effects.push(
+            new HitEffect("注意节拍", this.finger_original[0], this.finger_original[1], 
+              this.bgm.getTime(), 1, Math.PI * 1.5 + (Math.random() - 0.5) * Math.PI * 0.1, 100 + 100 * Math.random()))
         }
+      } else if (this.currentPhase == PHASE_PLAY_END) {
+        this.stop()
+        databus.status = databus.STATUS_TEST
       }
     }
     if (type == 1) {
@@ -279,13 +338,29 @@ export default class Play extends Status {
       case PHASE_INTRO:
         if (this.intro.ended) {
           this.currentPhase = PHASE_INTRO_END
-          canvas.addEventListener('touchmove',  this.touchMoveHandler)
+          canvas.addEventListener('touchmove', this.touchMoveHandler)
           canvas.addEventListener('touchend', this.touchEndHandler)
         }
         break;
       case PHASE_INTRO_END:
         break;
       case PHASE_PLAY:
+        if (!this.applauded && (new Date()).getTime() >= this.start_ts + this.bgTime * 1000) {
+          this.applauded = true
+          this.applaud_mic.currentTime = 0
+          this.applaud_mic.play()
+          this.result_text = '在本首演奏中，您成功演奏'+ this.HitRatio().toFixed(0) + '%的乐谱，综合评价为' + this.Evaluate() + '。获得观众打赏' + (10 + this.HitRatio()).toFixed(0) + '文! 目前存款' + (10 + this.HitRatio()).toFixed(0) +'文。\n向任意方向滑动屏幕返回首页。'
+          this.result_text_for_request = '在本首演奏中，您成功演奏百分之'+ this.HitRatio().toFixed(0) + '的乐谱，综合评价为' + this.Evaluate() + '。获得观众打赏' + (10 + this.HitRatio()).toFixed(0) + '文! 目前存款' + (10 + this.HitRatio()).toFixed(0) +'文。\n向任意方向滑动屏幕返回首页。'
+          console.log(this.result_text)
+          this.result_speak = this.RequestAudio(this.result_text_for_request)
+          this.result_hasspoke = false
+          // this.bgm.stop()
+          break;
+        }
+        if ((new Date()).getTime() >= this.start_ts + (this.applaudTime + this.bgTime) * 1000) {
+          this.currentPhase = PHASE_PLAY_END
+          this.start_ts = new Date().getTime()
+        }
         if (this.bgm.getTime() >= STOP_RECORD_TIME) {
           break;
         }
@@ -296,16 +371,20 @@ export default class Play extends Status {
         }
         if (this.bgm.getTime() >= this.next_hit + HIT_THRESHOLD) {
           if (this.hit_map[this.next_hit] === undefined) {
-            // wx.vibrateShort()
+            wx.vibrateShort()
             this.score_miss += 1
+            this.hit_effects.push(new HitEffect("错过了", screenWidth / 2 - 25 + 50 * (Math.random() - 0.5), screenHeight / 2 - 150, 
+                this.bgm.getTime(), 1, Math.PI * 1.5 + (Math.random() - 0.5) * Math.PI * 0.05, 100 + 100 * Math.random()))
           }
           this.next_hit += EST_INTERVAL
         }
-        if (this.bgm.getTime() >= this.bgTime) {
-          this.currentPhase = PHASE_PLAY_END
-        }
+        
         break;
       case PHASE_PLAY_END:
+        if (!this.result_hasspoke) {
+          this.result_hasspoke = true
+          this.result_speak.play()
+        }
         break;
     }
     if (this.finger_on) {
@@ -326,7 +405,7 @@ export default class Play extends Status {
       if (text.charAt(i) == '\n') {
         ix = 0
         iy++
-      } else if (text.charAt(i - 1) == '“' || text.charAt(i - 1) == '”') {
+      } else if (this.HalfSizeChar(text.charAt(i - 1))) {
         ix += 0.5
       } else {
         ix++
@@ -347,5 +426,29 @@ export default class Play extends Status {
     }
     this.frame_counter++;
     this.ctx.globalAlpha = 1
+  }
+  HalfSizeChar(ch) {
+    return ch == '”' || ch == '“' || (ch >= '0' && ch <= '9') || ch == '!' || ch == '%'
+  }
+  HitRatio() {
+    let tot = this.score_hit + this.score_duplicate + this.score_wrongdir + this.score_wrongtime + this.score_miss
+    let hit_ratio = (this.score_hit) / (tot) * 100
+    return isNaN(hit_ratio) ? 100 : hit_ratio
+  }
+  Evaluate() {
+    // 返回 S / A / B / C / D / F
+    let tot = this.score_hit + this.score_duplicate + this.score_wrongdir + this.score_wrongtime + this.score_miss
+    let hit_ratio = (this.score_hit + 20) / (tot + 20)
+    if (hit_ratio > 0.95) {
+      return 'S';
+    } else if (hit_ratio > 0.9) {
+      return 'A';
+    } else if (hit_ratio > 0.8) {
+      return 'B';
+    } else if (hit_ratio > 0.6) {
+      return 'C'
+    } else if (hit_ratio > 0.3) {
+      return 'D'
+    } else return 'F'
   }
 }
