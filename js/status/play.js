@@ -279,6 +279,7 @@ export default class Play extends Status {
       this.slide_op_detector = 0;
       if (this.currentPhase == PHASE_INTRO || this.currentPhase == PHASE_INTRO_END) {
         this.currentPhase = PHASE_PLAY
+        this.start_ts = new Date().getTime()
         this.bgm.play()
       } else if (this.currentPhase == PHASE_PLAY) {
         console.log(this.bgm.getTime())
@@ -428,7 +429,7 @@ export default class Play extends Status {
     this.ctx.globalAlpha = 1
   }
   HalfSizeChar(ch) {
-    return ch == '”' || ch == '“' || (ch >= '0' && ch <= '9') || ch == '!' || ch == '%'
+    return ch == '”' || ch == '“' || (ch >= '0' && ch <= '9') || ch == '!'
   }
   HitRatio() {
     let tot = this.score_hit + this.score_duplicate + this.score_wrongdir + this.score_wrongtime + this.score_miss
