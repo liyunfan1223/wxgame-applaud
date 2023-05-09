@@ -35,7 +35,7 @@ let instance
 class WebAudioContextWrapper {
   constructor(url) {
     this.url = url
-    
+    this.started = false
     this.loadAudio(url).then(buffer => {
       this.source_buffer = buffer
     }).catch(() => {
@@ -48,10 +48,13 @@ class WebAudioContextWrapper {
     this.source.buffer = this.source_buffer
     this.source.connect(this.ctx.destination)
     this.source.start()
+    this.started = true
   }
   stop() {
-    this.source.stop()
-    this.ctx.suspend()
+    if (this.started) {
+      this.source.stop()
+      this.ctx.suspend()
+    }
   }
   getTime() {
     return this.ctx.currentTime
@@ -109,6 +112,8 @@ export default class Play extends Status {
 
     this.instrument_mic = wx.createInnerAudioContext({ useWebAudioImplement: true })
     this.instrument_mic.src = 'audio/instrument_gz.mp3'
+    this.applaud_mic = wx.createInnerAudioContext({ useWebAudioImplement: true })
+    this.applaud_mic.src = 'audio/applaud.mp3'
     this.instrument_pic = new Image()
     this.instrument_pic.src = 'images/gz2.png'
     this.frame_counter = 0
@@ -291,7 +296,7 @@ export default class Play extends Status {
         }
         if (this.bgm.getTime() >= this.next_hit + HIT_THRESHOLD) {
           if (this.hit_map[this.next_hit] === undefined) {
-            wx.vibrateShort()
+            // wx.vibrateShort()
             this.score_miss += 1
           }
           this.next_hit += EST_INTERVAL

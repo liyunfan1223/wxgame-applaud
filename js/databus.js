@@ -23,6 +23,6 @@ export default class DataBus {
 
   reset() {
     this.frame      = 0
-    this.status = this.STATUS_PLAY
+    this.status = this.STAT
   }
 }
