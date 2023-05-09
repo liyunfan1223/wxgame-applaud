@@ -5,6 +5,7 @@ import Play from './status/play'
 import Test from './status/test'
 import Store from './status/store'
 import Story from './status/story'
+import Story_music from './status/story_music'
 
 const ctx = canvas.getContext('2d')
 const databus = new DataBus()
@@ -54,6 +55,9 @@ export default class Main {
         case databus.STATUS_PLAY:
           this.currentStatus = new Play(ctx)
           break
+        case databus.STATUS_STORY_MUSIC:
+            this.currentStatus = new Story_music(ctx)
+            break
       }
       this.currentStatus.start()
     }

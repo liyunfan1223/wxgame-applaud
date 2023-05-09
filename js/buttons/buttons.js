@@ -148,3 +148,45 @@ export class SwitchToStory extends Button {
     )
   }
 }
+
+class ButtonWithText {
+  constructor(dx, dy,text) {
+    // 左上角位置坐标
+    this.dx = dx
+    this.dy = dy
+    this.text = text
+  }
+  ClickInsideButton(x, y) {
+    if (x >= this.dx && x <= this.dx + this.dw &&
+        y >= this.dy && y <= this.dy + this.dh) {
+      return true;
+    }
+    return false;
+  }
+};
+export class SquareButton extends ButtonWithText {
+  constructor(dx, dy,text) {
+    super(dx, dy,text)
+    // 裁剪位置和长宽
+    this.sx = 6;
+    this.sy = 108;
+    this.sw = 57;
+    this.sh = 50;
+    // 显示大小
+    this.dw = 100;
+    this.dh = 100;
+  }
+  render(ctx) {
+    ctx.drawImage(
+      atlas,
+      this.sx, this.sy, this.sw, this.sh,
+      this.dx, this.dy,
+      this.dw, this.dh
+    )
+    ctx.fillText(
+      this.text,
+      this.dx + 12,
+      this.dy + 55,
+    )
+  }
+}

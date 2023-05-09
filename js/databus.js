@@ -16,6 +16,7 @@ export default class DataBus {
     this.STATUS_STORE = 3
     this.STATUS_STORY = 4
     this.STATUS_PLAY = 5
+    this.STATUS_STORY_MUSIC = 6
     // this.pool = new Pool()
     this.reset()
   }

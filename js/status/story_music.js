@@ -11,7 +11,7 @@ const screenWidth  = window.innerWidth
 const screenHeight = window.innerHeight
 
 let instance
-export default class Story extends Status {
+export default class Story_music extends Status {
   constructor(ctx) {
     super(ctx)
     if ( instance )
@@ -23,11 +23,12 @@ export default class Story extends Status {
     this.init(ctx)
   }
   init() {
-    this.story1=new SquareButton(screenWidth / 2 - 110, screenHeight / 2 - 150 ,"街边卖艺")
+    this.story1=new SquareButton(screenWidth / 2 - 110, screenHeight / 2 - 150 ,"沧海笑")
     this.story2=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 ,"待解锁")
     this.story3=new SquareButton(screenWidth / 2 -110, screenHeight / 2 - 150 +110,"待解锁")
     this.story4=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 +110,"待解锁")
-    this.story_list=['街边卖艺','待解锁','待解锁','待解锁']
+
+    this.story_list=['沧海笑','待解锁','待解锁','待解锁']
     this.switch_to_test = new SwitchToTest(screenWidth / 2 - 60, screenHeight / 2 - 100 + 180+60)
   }
   stop() {
@@ -37,10 +38,10 @@ export default class Story extends Status {
     wx.stopGyroscope()
   }
   start() {
-    this.touch_tag=0
     this.operation_counter=0
-
-    let aud = new Audio('https://fanyi.sogou.com/reventondc/synthesis?text=' + '出门了！今天去哪里演奏呢？双指左右滑动切换选项。' + '&speed=1&lang=zh-CHS&from=translateweb&speaker=6')
+    this.touch_tag=0
+    // console.log(111111)
+    let aud = new Audio('https://fanyi.sogou.com/reventondc/synthesis?text=' + '请选择演奏的曲目吧！双指左右滑动切换选项。' + '&speed=1&lang=zh-CHS&from=translateweb&speaker=6')
     aud.play()
     canvas.addEventListener('touchstart', this.touchStartHandler)
     canvas.addEventListener('touchmove',  this.touchMoveHandler)
@@ -54,22 +55,21 @@ export default class Story extends Status {
     this.finger_on = true
     this.finger_duration = false
     this.slide_op_detector = 1
-    if (this.switch_to_test.ClickInsideButton(x, y)) {
+    if (this.switch_to_test.ClickInsideButton(x, y) ) {
       this.stop(this.ctx)
       databus.status = databus.STATUS_TEST
     }
     if (this.story1.ClickInsideButton(x, y) && this.touch_tag==0) {
       this.stop(this.ctx)
-      databus.status = databus.STATUS_STORY_MUSIC
-      databus.story = 1
+      databus.story_music = 1
+      // console.log(databus)
+      databus.status = databus.STATUS_PLAY
     }
-    // console.log(this)
-    if ((this.operation_counter)%this.story_list.length==1 && this.touch_tag==1){
+    if ((this.operation_counter-1)%this.story_list.length==0 && this.touch_tag==1){
       this.stop(this.ctx)
-      databus.status = databus.STATUS_STORY_MUSIC
+      databus.status = databus.STATUS_PLAY
       databus.story = 1
     }
-
   }
   touchMoveEventHandler(e) {
     e.preventDefault()
