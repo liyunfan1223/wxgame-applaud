@@ -15,7 +15,7 @@ const EST_INTERVAL = 0.925
 const FIRST_HIT = 11.8
 const HIT_THRESHOLD = 0.3 // 操作时间误差要小于阈值才算
 const HIT_DIRECTION_SWITH_TS = [
-  18.96, 25.82, 33.23, 40.84, 47.92, 55.3, 62.66
+  18.96, 25.82, 33.23, 40.84, 48.3, 55.3, 63.18
 ]
 const STOP_RECORD_TIME = 70.5
 
@@ -199,7 +199,7 @@ export default class Play extends Status {
     this.finger_duration = false
     this.slide_op_detector = 1
     if (this.switch_to_test.ClickInsideButton(x, y)) {
-      this.stop(this.ctx)
+      this.stop()
       databus.status = databus.STATUS_TEST
     }
   }
@@ -235,7 +235,7 @@ export default class Play extends Status {
     this.ctx.drawImage(this.bg, 0, 0, screenWidth, screenHeight)
     if (this.currentPhase == PHASE_INTRO || this.currentPhase == PHASE_INTRO_END) {
       this.ctx.font      = "20px Arial"
-      this.FillTextForMultiLinesWithGradual(INTRODUCTION + "\n" + GANE_INTRO, screenWidth / 2 - 150, 80, 300, 2000, 150, 20)
+      this.FillTextForMultiLinesWithGradual(INTRODUCTION + "\n" + GANE_INTRO, screenWidth / 2 - 150, 120, 300, 2000, 150, 20)
     } else if (this.currentPhase == PHASE_PLAY) {
       this.ctx.font      = "20px Arial"
       this.ctx.fillText("正在播放:沧海一声笑", screenWidth / 2 - 100, 80)
@@ -246,9 +246,9 @@ export default class Play extends Status {
       // this.ctx.fillText("太早或太晚:" + this.score_wrongtime, screenWidth / 2 - 80, 280)
       // this.ctx.fillText("方向错误:" + this.score_wrongdir, screenWidth / 2 - 80, 320)
 
-      this.ctx.globalAlpha = 0.8
-    // let ratio = 2 + (databus.frame % 240 >= 120 ? 240 - databus.frame % 240 : databus.frame % 240) / 100 * 0.2
-      let ratio = 2.2
+      this.ctx.globalAlpha = 0.8    
+      // let ratio = 2 + (databus.frame % 240 >= 120 ? 240 - databus.frame % 240 : databus.frame % 240) / 100 * 0.2
+      let ratio = 2.5
       this.ctx.drawImage(this.instrument_pic, 
         screenWidth / 2 - this.instrument_pic.width / 2 / ratio, 
         screenHeight / 2 - this.instrument_pic.height / 2 / ratio ,
@@ -256,7 +256,7 @@ export default class Play extends Status {
         this.ctx.globalAlpha = 1
     } else if (this.currentPhase == PHASE_PLAY_END) {
       this.ctx.font      = "20px Arial"
-      this.FillTextForMultiLinesWithGradual(this.result_text, screenWidth / 2 - 150, 80, 300, 2000, 150, 20)
+      this.FillTextForMultiLinesWithGradual(this.result_text, screenWidth / 2 - 150, 120, 300, 2000, 150, 20)
     }
     this.ctx.fillStyle = "#ffffff"
     this.switch_to_test.render(this.ctx)
@@ -318,7 +318,7 @@ export default class Play extends Status {
         }
       } else if (this.currentPhase == PHASE_PLAY_END) {
         this.stop()
-        databus.status = databus.STATUS_TEST
+        databus.status = databus.STATUS_INDEX
       }
     }
     if (type == 1) {
