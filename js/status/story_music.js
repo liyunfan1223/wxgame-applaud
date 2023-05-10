@@ -41,8 +41,8 @@ export default class Story_music extends Status {
     this.operation_counter=0
     this.touch_tag=0
     // console.log(111111)
-    let aud = new Audio('https://fanyi.sogou.com/reventondc/synthesis?text=' + '请选择演奏的曲目吧！双指左右滑动切换选项。' + '&speed=1&lang=zh-CHS&from=translateweb&speaker=6')
-    aud.play()
+    this.aud = new Audio('https://fanyi.sogou.com/reventondc/synthesis?text=' + '请选择演奏的曲目吧！双指左右滑动切换选项。' + '&speed=1&lang=zh-CHS&from=translateweb&speaker=6')
+    this.aud.play()
     canvas.addEventListener('touchstart', this.touchStartHandler)
     canvas.addEventListener('touchmove',  this.touchMoveHandler)
     canvas.addEventListener('touchend', this.touchEndHandler)
@@ -57,16 +57,19 @@ export default class Story_music extends Status {
     this.slide_op_detector = 1
     if (this.switch_to_test.ClickInsideButton(x, y) ) {
       this.stop(this.ctx)
+      this.aud.pause()
       databus.status = databus.STATUS_TEST
     }
     if (this.story1.ClickInsideButton(x, y) && this.touch_tag==0) {
       this.stop(this.ctx)
+      this.aud.pause()
       databus.story_music = 1
       // console.log(databus)
       databus.status = databus.STATUS_PLAY
     }
     if ((this.operation_counter-1)%this.story_list.length==0 && this.touch_tag==1){
       this.stop(this.ctx)
+      this.aud.pause()
       databus.status = databus.STATUS_PLAY
       databus.story = 1
     }
