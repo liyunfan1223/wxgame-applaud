@@ -23,6 +23,8 @@ export default class Story_music extends Status {
     this.init(ctx)
   }
   init() {
+    this.bg = new Image()
+    this.bg.src = 'images/play_bg.jpg'
     this.story1=new SquareButton(screenWidth / 2 - 110, screenHeight / 2 - 150 ,"沧海笑")
     this.story2=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 ,"待解锁")
     this.story3=new SquareButton(screenWidth / 2 -110, screenHeight / 2 - 150 +110,"待解锁")
@@ -107,9 +109,11 @@ export default class Story_music extends Status {
     this.renderInfo()
   }
   renderInfo() {
-    this.ctx.fillStyle = "#ffffff"
+    this.ctx.drawImage(this.bg, 0, 0, canvas.width, canvas.height)
+    this.ctx.fillStyle = "#000000"
     this.ctx.font      = "20px Arial"
-    this.ctx.fillText("剧情界面", 10, 50)
+    this.ctx.fillText("选择乐曲", 50, 60)
+    this.ctx.fillStyle = "#ffffff"
     this.switch_to_test.render(this.ctx)
     this.story1.render(this.ctx)
     this.story2.render(this.ctx)

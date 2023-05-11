@@ -25,7 +25,9 @@ export default class Test extends Status {
     this.init(ctx)
   }
   init(ctx) {
-    this.bg = new BackGround(ctx)
+    // this.bg = new BackGround(ctx)
+    this.bg = new Image()
+    this.bg.src = 'images/play_bg_logo.png'
     this.gameinfo = new GameInfo()
     this.finger_now = [0, 0]
     this.finger_original = [0, 0]
@@ -119,18 +121,19 @@ export default class Test extends Status {
   }
   render() {
     this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-    this.bg.render(this.ctx)
+    // this.bg.render(this.ctx)
     this.renderIndicatorInfo()
   }
   renderIndicatorInfo() {
+    this.ctx.drawImage(this.bg, 0, 0, canvas.width, canvas.height)
     this.ctx.fillStyle = "#ffffff"
     this.ctx.font      = "20px Arial"
-    this.ctx.fillText("当前位置:" + this.finger_now, 10, 50)
-    this.ctx.fillText("初始位置:" + this.finger_original, 10, 100)
-    this.ctx.fillText("持续时间(帧):" + this.finger_duration, 10, 150)
-    this.ctx.fillText("陀螺仪参数:" + this.gyroscope, 10, 200)
-    this.ctx.fillText("上一次操作识别:" + this.current_operation, 10, 250)
-    this.ctx.fillText("操作数:" + this.operation_counter, 10, 300)
+    // this.ctx.fillText("当前位置:" + this.finger_now, 10, 50)
+    // this.ctx.fillText("初始位置:" + this.finger_original, 10, 100)
+    // this.ctx.fillText("持续时间(帧):" + this.finger_duration, 10, 150)
+    // this.ctx.fillText("陀螺仪参数:" + this.gyroscope, 10, 200)
+    // this.ctx.fillText("上一次操作识别:" + this.current_operation, 10, 250)
+    // this.ctx.fillText("操作数:" + this.operation_counter, 10, 300)
     this.switch_to_play.render(this.ctx)
     this.switch_to_index.render(this.ctx)
     this.switch_to_store.render(this.ctx)
@@ -155,7 +158,7 @@ export default class Test extends Status {
     aud.play()
   }
   update() {
-    this.bg.update()
+    // this.bg.update()
     if (this.finger_on) {
       this.finger_duration += 1
     }
