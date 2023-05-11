@@ -23,6 +23,8 @@ export default class Play extends Status {
     this.init(ctx)
   }
   init() {
+    this.bg = new Image()
+    this.bg.src = 'images/play_bg.jpg'
     this.instrument1=new SquareButton(screenWidth / 2 - 110, screenHeight / 2 - 150 ,"古琴")
     this.instrument2=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 ,"笛子")
     this.story_list=['古琴','笛子']
@@ -111,9 +113,11 @@ export default class Play extends Status {
     this.renderInfo()
   }
   renderInfo() {
-    this.ctx.fillStyle = "#ffffff"
+    this.ctx.drawImage(this.bg, 0, 0, canvas.width, canvas.height)
+    this.ctx.fillStyle = "#000000"
     this.ctx.font      = "20px Arial"
-    this.ctx.fillText("开始界面", 10, 50)
+    this.ctx.fillText("开始界面", 50, 60)
+    this.ctx.fillStyle = "#ffffff"
     this.switch_to_test.render(this.ctx)
     this.instrument1.render(this.ctx)
     this.instrument2.render(this.ctx)
