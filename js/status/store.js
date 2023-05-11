@@ -2,7 +2,7 @@ import Status from './status'
 import GameInfo from '../runtime/gameinfo'
 import DataBus from '../databus'
 import BackGround from '../runtime/background'
-import {SwitchToTest} from '../buttons/buttons'
+import {SwitchToTest,SquareButton} from '../buttons/buttons'
 
 const databus = new DataBus()
 
@@ -22,7 +22,13 @@ export default class Play extends Status {
     this.init(ctx)
   }
   init() {
-    this.switch_to_test = new SwitchToTest(screenWidth / 2 - 60, screenHeight / 2 - 100 + 180)
+    this.instrument1=new SquareButton(screenWidth / 2 - 110, screenHeight / 2 - 150 ,"古琴")
+    this.instrument2=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 ,"笛子")
+    this.instrument3=new SquareButton(screenWidth / 2 -110, screenHeight / 2 - 150 +110,"古筝")
+    this.instrument4=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 +110,"二胡")
+    this.instrument5=new SquareButton(screenWidth / 2 -110, screenHeight / 2 - 150 +220,"编钟")
+    this.instrument6=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 +220,"琵琶")
+    this.switch_to_test = new SwitchToTest(screenWidth / 2 - 60, screenHeight / 2 - 100 + 280)
   }
   stop() {
     canvas.removeEventListener('touchstart', this.touchStartHandler)
@@ -31,6 +37,8 @@ export default class Play extends Status {
     wx.stopGyroscope()
   }
   start() {
+    this.aud = new Audio('https://fanyi.sogou.com/reventondc/synthesis?text=' + '欢迎来到乐器商店！双指左滑挑选乐器。' + '&speed=1&lang=zh-CHS&from=translateweb&speaker=6')
+    this.aud.play()
     canvas.addEventListener('touchstart', this.touchStartHandler)
     canvas.addEventListener('touchmove',  this.touchMoveHandler)
     canvas.addEventListener('touchend', this.touchEndHandler)
@@ -61,6 +69,12 @@ export default class Play extends Status {
     this.ctx.font      = "20px Arial"
     this.ctx.fillText("商店界面", 10, 50)
     this.switch_to_test.render(this.ctx)
+    this.instrument1.render(this.ctx)
+    this.instrument2.render(this.ctx)
+    this.instrument3.render(this.ctx)
+    this.instrument4.render(this.ctx)
+    this.instrument5.render(this.ctx)
+    this.instrument6.render(this.ctx)
   }
   update() {
   }
