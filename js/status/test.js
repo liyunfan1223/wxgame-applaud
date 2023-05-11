@@ -27,7 +27,7 @@ export default class Test extends Status {
   init(ctx) {
     // this.bg = new BackGround(ctx)
     this.bg = new Image()
-    this.bg.src = 'images/play_bg_logo.png'
+    this.bg.src = 'images/play_bg_logo.jpg'
     this.gameinfo = new GameInfo()
     this.finger_now = [0, 0]
     this.finger_original = [0, 0]
