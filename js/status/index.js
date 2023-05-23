@@ -39,7 +39,7 @@ export default class Play extends Status {
   start() {
     this.touch_tag=0
     this.operation_counter=0
-    this.aud = new Audio('https://fanyi.sogou.com/reventondc/synthesis?text=' + '新的一天开始了！你是一名乐师，目前存款为：0。今日的演出就要开始了！请问你想带哪一个乐器出门呢？'+ '环顾屋子，好像只有自制的古琴和新做的笛子。双指左右滑动切换乐器，下滑进入乐器商店。'  + '&speed=1&lang=zh-CHS&from=translateweb&speaker=6')
+    this.aud = new Audio('https://fanyi.sogou.com/reventondc/synthesis?text=' + '新的一天开始了！你是一名乐师。请问你想带哪一个乐器出门呢？'+ '双指左右滑动切换乐器，下滑进入乐器商店。'  + '&speed=1&lang=zh-CHS&from=translateweb&speaker=6')
     this.aud.play()
     canvas.addEventListener('touchstart', this.touchStartHandler)
     canvas.addEventListener('touchmove',  this.touchMoveHandler)

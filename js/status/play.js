@@ -198,10 +198,10 @@ export default class Play extends Status {
     this.finger_on = true
     this.finger_duration = false
     this.slide_op_detector = 1
-    if (this.switch_to_test.ClickInsideButton(x, y)) {
-      this.stop()
-      databus.status = databus.STATUS_TEST
-    }
+    // if (this.switch_to_test.ClickInsideButton(x, y)) {
+    //   this.stop()
+    //   databus.status = databus.STATUS_TEST
+    // }
   }
   touchMoveEventHandler(e) {
     e.preventDefault()
@@ -259,7 +259,7 @@ export default class Play extends Status {
       this.FillTextForMultiLinesWithGradual(this.result_text, screenWidth / 2 - 150, 120, 300, 2000, 150, 20)
     }
     this.ctx.fillStyle = "#ffffff"
-    this.switch_to_test.render(this.ctx)
+    // this.switch_to_test.render(this.ctx)
   }
   render_hit_effects() {
     let now = this.bgm.getTime()
@@ -318,7 +318,7 @@ export default class Play extends Status {
         }
       } else if (this.currentPhase == PHASE_PLAY_END) {
         this.stop()
-        databus.status = databus.STATUS_INDEX
+        databus.status = databus.STATUS_TEST
       }
     }
     if (type == 1) {
