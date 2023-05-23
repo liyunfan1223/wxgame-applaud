@@ -23,6 +23,7 @@ export default class Story extends Status {
     this.init(ctx)
   }
   init() {
+    this.finger_original=[0,0]
     this.bg = new Image()
     this.bg.src = 'images/play_bg.jpg'
     this.story1=new SquareButton(screenWidth / 2 - 110, screenHeight / 2 - 150 ,"街边卖艺")

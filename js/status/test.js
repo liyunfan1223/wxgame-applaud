@@ -37,10 +37,11 @@ export default class Test extends Status {
     this.current_operation = ""
     this.operation_counter = 0
     this.slide_op_detector = 0
-    this.switch_to_index = new SwitchToIndex(screenWidth / 2 - 120, screenHeight / 2 + 80)
-    this.switch_to_store = new SwitchToStore(screenWidth / 2, screenHeight / 2 + 80)
-    this.switch_to_story = new SwitchToStory(screenWidth / 2 - 120, screenHeight / 2 + 120)
-    this.switch_to_play = new SwitchToPlay(screenWidth / 2, screenHeight / 2 + 120)
+    this.switch_to_index = new SwitchToIndex(screenWidth / 2 - 60, screenHeight / 2 + 60)
+    // this.switch_to_index = new SwitchToIndex(screenWidth / 2 - 120, screenHeight / 2 + 80)
+    // this.switch_to_store = new SwitchToStore(screenWidth / 2, screenHeight / 2 + 80)
+    // this.switch_to_story = new SwitchToStory(screenWidth / 2 - 120, screenHeight / 2 + 120)
+    // this.switch_to_play = new SwitchToPlay(screenWidth / 2, screenHeight / 2 + 120)
   }
   stop() {
     canvas.removeEventListener('touchstart', this.touchStartHandler)
@@ -49,6 +50,8 @@ export default class Test extends Status {
     wx.stopGyroscope()
   }
   start() {
+    this.aud = new Audio('https://fanyi.sogou.com/reventondc/synthesis?text=' + '欢迎来到游戏：蒙眼乐师，倾斜手机，进入游戏！'  + '&speed=1&lang=zh-CHS&from=translateweb&speaker=6')
+    this.aud.play()
     this.finger_now = [0, 0]
     this.finger_original = [0, 0]
     this.finger_duration = 0
@@ -68,13 +71,17 @@ export default class Test extends Status {
       let z = result.z
       this.gyroscope = [x, y, z]
       if (x > THRESHOLD_SKEW) {
-        this.RecordOperation("手机下倾", 1)
+      databus.status = databus.STATUS_INDEX
+      // this.RecordOperation("手机下倾", 1)
       } else if (x < -THRESHOLD_SKEW) {
-        this.RecordOperation("手机上倾", 1)
+      databus.status = databus.STATUS_INDEX
+      // this.RecordOperation("手机上倾", 1)
       } else if (y > THRESHOLD_SKEW) {
-        this.RecordOperation("手机右倾", 1)
+      databus.status = databus.STATUS_INDEX
+      // this.RecordOperation("手机右倾", 1)
       } else if (y < -THRESHOLD_SKEW) {
-        this.RecordOperation("手机左倾", 1)
+      databus.status = databus.STATUS_INDEX
+      // this.RecordOperation("手机左倾", 1)
       }
     })
   }
@@ -86,19 +93,21 @@ export default class Test extends Status {
     this.finger_on = true
     this.finger_duration = false
     this.slide_op_detector = 1
-    if (this.switch_to_play.ClickInsideButton(x, y)) {
+    if (this.switch_to_index.ClickInsideButton(x, y)) {
       this.stop()
-      databus.status = databus.STATUS_PLAY
-    } else if (this.switch_to_index.ClickInsideButton(x, y)) {
-      this.stop()
+      this.aud.pause()
       databus.status = databus.STATUS_INDEX
-    } else if (this.switch_to_store.ClickInsideButton(x, y)) {
-      this.stop()
-      databus.status = databus.STATUS_STORE
-    } else if (this.switch_to_story.ClickInsideButton(x, y)) {
-      this.stop()
-      databus.status = databus.STATUS_STORY
-    }
+    } 
+    // else if (this.switch_to_play.ClickInsideButton(x, y)) {
+    //   this.stop()
+    //   databus.status = databus.STATUS_PLAY
+    // } else if (this.switch_to_store.ClickInsideButton(x, y)) {
+    //   this.stop()
+    //   databus.status = databus.STATUS_STORE
+    // } else if (this.switch_to_story.ClickInsideButton(x, y)) {
+    //   this.stop()
+    //   databus.status = databus.STATUS_STORY
+    // }
   }
   touchMoveEventHandler(e) {
     e.preventDefault()
@@ -106,13 +115,13 @@ export default class Test extends Status {
     const y = e.touches[0].clientY
     this.finger_now = [x, y]
     if (x < this.finger_original[0] - THRESHOLD_SLIDE) {
-      this.RecordOperation("左滑", 0)
+      // this.RecordOperation("左滑", 0)
     } else if (x > this.finger_original[0] + THRESHOLD_SLIDE) {
-      this.RecordOperation("右滑", 0)
+      // this.RecordOperation("右滑", 0)
     } else if (y < this.finger_original[1] - THRESHOLD_SLIDE) {
-      this.RecordOperation("上滑", 0)
+      // this.RecordOperation("上滑", 0)
     } else if (y > this.finger_original[1] + THRESHOLD_SLIDE) {
-      this.RecordOperation("下滑", 0)
+      // this.RecordOperation("下滑", 0)
     }
   }
   touchEndEventHandler(e) {
@@ -134,10 +143,10 @@ export default class Test extends Status {
     // this.ctx.fillText("陀螺仪参数:" + this.gyroscope, 10, 200)
     // this.ctx.fillText("上一次操作识别:" + this.current_operation, 10, 250)
     // this.ctx.fillText("操作数:" + this.operation_counter, 10, 300)
-    this.switch_to_play.render(this.ctx)
+    // this.switch_to_play.render(this.ctx)
     this.switch_to_index.render(this.ctx)
-    this.switch_to_store.render(this.ctx)
-    this.switch_to_story.render(this.ctx)
+    // this.switch_to_store.render(this.ctx)
+    // this.switch_to_story.render(this.ctx)
   }
   RecordOperation(operation, type) {
     if (type == 0) {

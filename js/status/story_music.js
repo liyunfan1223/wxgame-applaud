@@ -2,7 +2,7 @@ import Status from './status'
 import GameInfo from '../runtime/gameinfo'
 import DataBus from '../databus'
 import BackGround from '../runtime/background'
-import {SwitchToTest,SquareButton} from '../buttons/buttons'
+import {SwitchToTest,SquareButton,Button_Canghai} from '../buttons/buttons'
 
 const databus = new DataBus()
 const THRESHOLD_SLIDE = 50
@@ -23,14 +23,15 @@ export default class Story_music extends Status {
     this.init(ctx)
   }
   init() {
+    this.finger_original=[0,0]
     this.bg = new Image()
     this.bg.src = 'images/play_bg.jpg'
-    this.story1=new SquareButton(screenWidth / 2 - 110, screenHeight / 2 - 150 ,"沧海笑")
+    this.story1=new Button_Canghai(screenWidth / 2 - 110, screenHeight / 2 - 150 ,"沧海一声笑")
     this.story2=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 ,"待解锁")
     this.story3=new SquareButton(screenWidth / 2 -110, screenHeight / 2 - 150 +110,"待解锁")
     this.story4=new SquareButton(screenWidth / 2 +10, screenHeight / 2 - 150 +110,"待解锁")
 
-    this.story_list=['沧海笑','待解锁','待解锁','待解锁']
+    this.story_list=['沧海一声笑','待解锁','待解锁','待解锁']
     this.switch_to_test = new SwitchToTest(screenWidth / 2 - 60, screenHeight / 2 - 100 + 180+60)
   }
   stop() {

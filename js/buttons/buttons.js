@@ -61,7 +61,7 @@ export class SwitchToTest extends Button {
       this.dw, this.dh
     )
     ctx.fillText(
-      '返回测试',
+      '返回主页',
       this.dx + 20,
       this.dy + 25,
     )
@@ -88,7 +88,7 @@ export class SwitchToIndex extends Button {
       this.dw, this.dh
     )
     ctx.fillText(
-      '开始界面',
+      '开始游戏',
       this.dx + 20,
       this.dy + 25,
     )
@@ -186,6 +186,32 @@ export class SquareButton extends ButtonWithText {
     ctx.fillText(
       this.text,
       this.dx + 12,
+      this.dy + 55,
+    )
+  }
+}
+export class Button_Canghai extends ButtonWithText {
+  constructor(dx, dy,text) {
+    super(dx, dy,text)
+    // 裁剪位置和长宽
+    this.sx = 6;
+    this.sy = 108;
+    this.sw = 57;
+    this.sh = 50;
+    // 显示大小
+    this.dw = 100;
+    this.dh = 100;
+  }
+  render(ctx) {
+    ctx.drawImage(
+      atlas,
+      this.sx, this.sy, this.sw, this.sh,
+      this.dx, this.dy,
+      this.dw, this.dh
+    )
+    ctx.fillText(
+      this.text,
+      this.dx + 0,
       this.dy + 55,
     )
   }
